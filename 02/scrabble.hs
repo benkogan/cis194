@@ -4,6 +4,7 @@ module HW02 where
 
 import Words
 import Data.List
+import Data.Ord
 
 -- Though a Scrabble hand is the same Haskell type as a Scrabble word, they
 -- have different properties. Specifically, a hand is unordered whereas a word
@@ -33,12 +34,30 @@ type STemplate = Template
 blank :: Char
 blank = '?'
 
+-- Find maximum scoring words from a list of words (ex. 6)
+
+bestWords :: [String] -> [String]
+bestWords xs = filter equalsMax xs
+  where equalsMax x  = scrabbleValueWord x == maxScore
+        maxScore     = scrabbleValueWord maxScoreWord
+        maxScoreWord = maximumBy (comparing scrabbleValueWord) xs
+
+-- Find the point value of a word (ex. 5)
+
+scrabbleValueWord :: String -> Int
+scrabbleValueWord ws = sum $ map scrabbleValue ws
+
+-- Find all words formable from a hand and a given template (ex. 4)
+
+wordsFittingTemplate :: Template -> Hand -> [String]
+wordsFittingTemplate ts hs = filter (wordFitsTemplate ts hs) allWords
+
 -- Check that a template can be matched to a word using a given hand (ex. 3)
 
 wordFitsTemplate :: Template -> Hand -> String -> Bool
 wordFitsTemplate [] _ [] = True
-wordFitsTemplate [] _ ws = False
-wordFitsTemplate ts _ [] = False
+wordFitsTemplate [] _ _  = False
+wordFitsTemplate  _ _ [] = False
 wordFitsTemplate (t:ts) hs (w:ws)
   | t == w                      = wordFitsTemplate ts hs ws
   | t == blank && (w `elem` hs) = wordFitsTemplate ts (delete w hs) ws
