@@ -31,8 +31,28 @@ type Template = String
 
 type STemplate = Template
 
-blank :: Char
-blank = '?'
+-- Compute value of a word on a given template, inc. all multipliers (ex. 7)
+
+scrabbleValueTemplate :: STemplate -> String -> Int
+scrabbleValueTemplate ts ws
+  | tripleWd `elem` ts = 3 * wordValue ts ws
+  | doubleWd `elem` ts = 2 * wordValue ts ws
+  | otherwise          = 1 * wordValue ts ws
+  where
+    tripleWd = 'T'
+    doubleWd = 'D'
+
+-- Compute value of a word on a given template, inc. only square multipliers
+
+wordValue :: STemplate -> String -> Int
+wordValue [] [] = 0
+wordValue (t:ts) (w:ws)
+  | t == tripleSq = 3 * scrabbleValue w + wordValue ts ws
+  | t == doubleSq = 2 * scrabbleValue w + wordValue ts ws
+  | otherwise     = 1 * scrabbleValue w + wordValue ts ws
+  where
+    tripleSq = '3'
+    doubleSq = '2'
 
 -- Find maximum scoring words from a list of words (ex. 6)
 
@@ -58,10 +78,23 @@ wordFitsTemplate :: Template -> Hand -> String -> Bool
 wordFitsTemplate [] _ [] = True
 wordFitsTemplate [] _ _  = False
 wordFitsTemplate  _ _ [] = False
-wordFitsTemplate (t:ts) hs (w:ws)
-  | t == w                      = wordFitsTemplate ts hs ws
-  | t == blank && (w `elem` hs) = wordFitsTemplate ts (delete w hs) ws
+wordFitsTemplate ts hs ws = wordFits ts hs ws
+
+-- Same as above, but accepts words of lesser length than template too (ex. 8)
+
+wordFitsTemplate' :: Template -> Hand -> String -> Bool
+wordFitsTemplate' _ _ [] = True
+wordFitsTemplate' [] _ _ = False
+wordFitsTemplate' ts hs ws = wordFits ts hs ws
+
+-- Template-matching logic for `wordFitsTemplate` and `wordFitsTemplate'`
+
+wordFits :: Template -> Hand -> String -> Bool
+wordFits (t:ts) hs (w:ws)
+  | t == w                      = wordFits ts hs ws
+  | t == blank && (w `elem` hs) = wordFits ts (delete w hs) ws
   | otherwise                   = False
+  where blank = '?'
 
 -- Find all words formable from a hand (ex. 2)
 
