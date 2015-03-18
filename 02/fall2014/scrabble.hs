@@ -104,7 +104,7 @@ wordsFrom hand = filter (`formableBy` hand) allWords
 -- Determine if a word is formable by a hand (ex. 1)
 
 formableBy :: String -> Hand -> Bool
-formableBy [] hand = True
+formableBy [] _ = True
 formableBy (w:ws) hand
   | w `elem` hand = formableBy ws (delete w hand)
   | otherwise     = False
