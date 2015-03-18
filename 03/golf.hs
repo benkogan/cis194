@@ -25,7 +25,7 @@ histogram :: [Integer] -> String
 histogram xs = put starCount ++ "\n==========\n0123456789\n"
   where put = concat . map ((++) "\n") . transpose . map stars
         starCount = map (count xs) [0..9]
-        count ys a = length $ filter (\x -> x == a) $ ys
+        count ys a = length $ filter (\x -> x == a) ys
         stars n = replicate (maxi - n) ' ' ++ replicate n '*'
         maxi = maximum starCount
 
